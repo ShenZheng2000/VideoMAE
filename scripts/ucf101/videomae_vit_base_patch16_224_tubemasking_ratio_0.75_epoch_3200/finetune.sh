@@ -1,13 +1,21 @@
+export CUDA_HOME=/usr/local/cuda-11.1
+export PATH=$CUDA_HOME/bin:$PATH
+export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$LD_LIBRARY_PATH
+
 # Set the path to save checkpoints
-OUTPUT_DIR='YOUR_PATH/ucf_videomae_pretrain_base_patch16_224_frame_16x4_tube_mask_0.75_videos_e3200/eval_lr_5e-4_epoch_100'
+YOUR_PATH="/home/shenzhen/Projects/VideoMAE"
+# OUTPUT_DIR="${YOUR_PATH}/ucf_videomae_pretrain_base_patch16_224_frame_16x4_tube_mask_0.75_videos_e3200/eval_lr_5e-4_epoch_100"
+# NOTE: use V2 here for debug & new finetune
+OUTPUT_DIR="${YOUR_PATH}/ucf_videomae_pretrain_base_patch16_224_frame_16x4_tube_mask_0.75_videos_e3200/eval_lr_5e-4_epoch_100_V2"
 # path to UCF101 annotation file (train.csv/val.csv/test.csv)
-DATA_PATH='YOUR_PATH/list_ucf'
+DATA_PATH="${YOUR_PATH}/list_ucf"
 # path to pretrain model
-MODEL_PATH='YOUR_PATH/ucf_videomae_pretrain_base_patch16_224_frame_16x4_tube_mask_0.75_videos_e3200/checkpoint.pth'
+MODEL_PATH="${YOUR_PATH}/ucf_videomae_pretrain_base_patch16_224_frame_16x4_tube_mask_0.75_videos_e3200/checkpoint-3200.pth"
 
 # batch_size can be adjusted according to number of GPUs
 # this script is for 8 GPUs (1 nodes x 8 GPUs)
-OMP_NUM_THREADS=1 python3 -m torch.distributed.launch --nproc_per_node=8 \
+# NOTE: use 6 GPUs for now
+OMP_NUM_THREADS=1 python3 -m torch.distributed.launch --nproc_per_node=6 \
     --master_port 12320  run_class_finetuning.py \
     --model vit_base_patch16_224 \
     --data_path ${DATA_PATH} \
@@ -35,6 +43,6 @@ OMP_NUM_THREADS=1 python3 -m torch.distributed.launch --nproc_per_node=8 \
     --test_num_crop 3 \
     --fc_drop_rate 0.5 \
     --drop_path 0.2 \
-    --use_checkpoint \
     --dist_eval \
+    --use_checkpoint \
     --enable_deepspeed 

@@ -1,12 +1,16 @@
 # Set the path to save checkpoints
-OUTPUT_DIR='YOUR_PATH/ucf_videomae_pretrain_base_patch16_224_frame_16x4_tube_mask_0.75_videos_e3200'
+YOUR_PATH='/home/shenzhen/Projects/VideoMAE'
+OUTPUT_DIR="${YOUR_PATH}/ucf_videomae_pretrain_base_patch16_224_frame_16x4_tube_mask_0.75_videos_e3200"
 # Set the path to UCF101 train set. 
-DATA_PATH='YOUR_PATH/list_ucf/train.csv'
+DATA_PATH="${YOUR_PATH}/list_ucf/train.csv"
 
+# NOTE: add absolute path to update train.csv and test.csv
+# NOTE: copy test.csv to be val.csv
 
 # batch_size can be adjusted according to number of GPUs
 # this script is for 8 GPUs (1 nodes x 8 GPUs)
-OMP_NUM_THREADS=1 python3 -m torch.distributed.launch --nproc_per_node=8 \
+# NOTE: use 6 GPUs for now
+OMP_NUM_THREADS=1 python3 -m torch.distributed.launch --nproc_per_node=6 \
          --master_port 12320 run_mae_pretraining.py \
         --data_path ${DATA_PATH} \
         --mask_type tube \
